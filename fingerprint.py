@@ -37,19 +37,19 @@ def is_pe(filepath):
 
 def dumps(filename,filepath):
 	# HEX
-	hexOutFile = f'analysis/{filename}_out/hex.txt'
+	hexOutFile = f'analysis/{filename}_out/hex_{filename}.txt'
 	hex = subprocess.run(['xxd',filepath], capture_output=True, text=True, check=True).stdout
 	with open(hexOutFile,'w') as f:
 		f.write(hex)
 	# STRINGS
-	strOutFile = f'analysis/{filename}_out/strings.txt'
+	strOutFile = f'analysis/{filename}_out/strings_{filename}.txt'
 	strings = subprocess.run(['strings',filepath], capture_output=True, text=True, check=True).stdout
 	with open(strOutFile,'w') as f:
 		f.write(strings)
 
 
 def clamscan(filename,filepath):
-	clamscanOutFile = f'analysis/{filename}_out/clamscan.txt'
+	clamscanOutFile = f'analysis/{filename}_out/clamscan_{filename}.txt'
 	with open(clamscanOutFile,'w') as f:
 		try:
 			scan = subprocess.run(['clamscan',filepath], text=True, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -73,7 +73,7 @@ def main():
 		for filename in os.listdir(args.path):
 			filepath = args.path + filename
 			os.makedirs(f'analysis/{filename}_out/')
-			infoFile = f'analysis/{filename}_out/infos.txt'
+			infoFile = f'analysis/{filename}_out/infos_{filename}.txt'
 			md5H,sha256H,sha1H,ssdeepH,impH = get_hashes(filepath)
 			fileOut,tridOut = get_file_type(filepath)
 			isPE = is_pe(filepath)
@@ -84,6 +84,7 @@ def main():
 			clamscan(filename,filepath)
 			shutil.copy(filepath,f'analysis/{filename}_out/')
 			print(f"Finished processing {filename}.")
+		print("\nAll samples processed !")
 
 if __name__=="__main__":
 	main()
