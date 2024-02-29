@@ -11,5 +11,7 @@ freshclam
 
 ### Use
 Pass the path to a folder containing your samples (and ONLY your samples) as an argument, like so :
-`python3 fingerprint.py --path path/to/samples/`
+```
+python3 fingerprint.py --path path/to/samples/
+```
 
