@@ -23,9 +23,14 @@ def get_hashes(filepath):
 
 def get_file_type(filepath):
 	fileOut = magic.from_file(filepath)
-	tridOut = subprocess.run(['trid', filepath], capture_output=True, text=True, check=True).stdout
-	return fileOut, tridOut
-
+	try:
+		tridOut = subprocess.run(['trid', filepath], text=True, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+		if tridOut.stdout:
+			return fileOut, tridOut.stdout
+	except subprocess.CalledProcessError as e:
+		if e.stderr:
+			print(e.stderr)
+			return fileOut, tridOut.stderr
 
 def is_pe(filepath):
 	try:
@@ -38,14 +43,25 @@ def is_pe(filepath):
 def dumps(filename,filepath):
 	# HEX
 	hexOutFile = f'analysis/{filename}_out/hex_{filename}.txt'
-	hex = subprocess.run(['xxd',filepath], capture_output=True, text=True, check=True).stdout
-	with open(hexOutFile,'w') as f:
-		f.write(hex)
+	try:
+		hex = subprocess.run(['xxd',filepath], text=True, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+		if hex.stdout:
+			with open(hexOutFile,'w') as f:
+				f.write(hex.stdout)
+	except subprocess.CalledProcessError as e:
+		if e.stderr:
+			print(e.stderr)
+
 	# STRINGS
 	strOutFile = f'analysis/{filename}_out/strings_{filename}.txt'
-	strings = subprocess.run(['strings',filepath], capture_output=True, text=True, check=True).stdout
-	with open(strOutFile,'w') as f:
-		f.write(strings)
+	try:
+		strings = subprocess.run(['strings',filepath], text=True, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+		if strings.stdout:
+			with open(strOutFile,'w') as f:
+				f.write(strings.stdout)
+	except subprocess.CalledProcessError as e:
+		if e.stderr:
+			print(e.stderr)
 
 
 def clamscan(filename,filepath):
@@ -55,11 +71,7 @@ def clamscan(filename,filepath):
 			scan = subprocess.run(['clamscan',filepath], text=True, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 			if scan.stdout:
 				f.write(scan.stdout)
-			if scan.stderr:
-				f.write(scan.stderr)
 		except subprocess.CalledProcessError as e:
-			if e.stdout:
-				f.write(e.stdout)
 			if e.stderr:
 				f.write(e.stderr)
 
