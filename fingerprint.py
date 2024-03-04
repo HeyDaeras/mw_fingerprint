@@ -27,10 +27,15 @@ def get_file_type(filepath):
 		tridOut = subprocess.run(['trid', filepath], text=True, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 		if tridOut.stdout:
 			return fileOut, tridOut.stdout
+		if tridOut.stderr:
+			return fileOut, tridOut.stderr
 	except subprocess.CalledProcessError as e:
 		if e.stderr:
 			print(e.stderr)
 			return fileOut, tridOut.stderr
+		if e.stdout:
+			print(e.stdout)
+			return fileOut, tridOut.stdout
 
 def is_pe(filepath):
 	try:
@@ -48,9 +53,14 @@ def dumps(filename,filepath):
 		if hex.stdout:
 			with open(hexOutFile,'w') as f:
 				f.write(hex.stdout)
+		if hex.stderr:
+			with open(hexOutFile,'w') as f:
+				f.write(hex.stderr)
 	except subprocess.CalledProcessError as e:
 		if e.stderr:
 			print(e.stderr)
+		if e.stdout:
+			print(e.stdout)
 
 	# STRINGS
 	strOutFile = f'analysis/{filename}_out/strings_{filename}.txt'
@@ -59,9 +69,14 @@ def dumps(filename,filepath):
 		if strings.stdout:
 			with open(strOutFile,'w') as f:
 				f.write(strings.stdout)
+		if strings.stderr:
+			with open(strOutFile,'w') as f:
+				f.write(strings.stderr)
 	except subprocess.CalledProcessError as e:
 		if e.stderr:
 			print(e.stderr)
+		if e.stdout:
+			print(e.stdout)
 
 
 def clamscan(filename,filepath):
@@ -71,9 +86,13 @@ def clamscan(filename,filepath):
 			scan = subprocess.run(['clamscan',filepath], text=True, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 			if scan.stdout:
 				f.write(scan.stdout)
+			if scan.stderr:
+				f.write(scan.stderr)
 		except subprocess.CalledProcessError as e:
 			if e.stderr:
 				f.write(e.stderr)
+			if e.stdout:
+				f.write(e.stdout)
 
 
 def main():
